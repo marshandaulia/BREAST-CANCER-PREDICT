@@ -17,4 +17,4 @@ __pycache__/
 # static/uploads/
 
 # File model (terlalu besar)
-models/model_with_db.h5
+models/
