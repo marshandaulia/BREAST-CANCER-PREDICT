@@ -15,3 +15,6 @@ __pycache__/
 # (Tergantung kasus Anda, jika static/css Anda buat manual, JANGAN abaikan)
 # Jika static/uploads berisi file upload-an user, tambahkan:
 # static/uploads/
+
+# File model (terlalu besar)
+models/model_with_db.h5
