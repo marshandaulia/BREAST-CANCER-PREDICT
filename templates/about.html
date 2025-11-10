@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="about-header text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold">Tentang Proyek Ini</h1>
+        <p class="lead">Aplikasi ini adalah implementasi dari model Deep Learning untuk klasifikasi Kanker Payudara.</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-6 animated-card">
+            <div class="about-card">
+                <i class="bi bi-robot"></i>
+                <h3>Model</h3>
+                <p class="text-muted">
+                    Menggunakan InceptionResNetV2 dengan <strong>CBAM (Convolutional Block Attention Module)</strong> untuk meningkatkan fokus pada fitur penting.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 animated-card" style="animation-delay: 0.1s;">
+            <div class="about-card">
+                <i class="bi bi-image-alt"></i>
+                <h3>Preprocessing</h3>
+                <p class="text-muted">
+                    Setiap gambar diproses dengan <strong>CLAHE (Contrast Limited Adaptive Histogram Equalization)</strong> untuk mempertajam detail gambar.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 animated-card" style="animation-delay: 0.2s;">
+            <div class="about-card">
+                <i class="bi bi-server"></i>
+                <h3>Backend</h3>
+                <p class="text-muted">
+                    Dibangun menggunakan <strong>Flask (Python)</strong> untuk melayani model dan mengelola permintaan unggahan gambar dari pengguna.
+                </pre>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 animated-card" style="animation-delay: 0.3s;">
+            <div class="about-card">
+                <i class="bi bi-display"></i>
+                <h3>Frontend</h3>
+                <p class="text-muted">
+                    Desain antarmuka (UI/UX) yang bersih dan responsif dibangun menggunakan <strong>Bootstrap 5</strong> dan file CSS/JS eksternal.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

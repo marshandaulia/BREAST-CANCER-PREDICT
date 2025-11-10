@@ -1,0 +1,17 @@
+# Folder Virtual Environment
+venv/
+
+# File environment (berisi rahasia/API key)
+.env
+
+# Folder cache Python
+__pycache__/
+
+# File database (jika Anda menggunakan sqlite misalnya)
+*.db
+*.sqlite3
+
+# Folder 'static' jika berisi file yang di-build/di-upload
+# (Tergantung kasus Anda, jika static/css Anda buat manual, JANGAN abaikan)
+# Jika static/uploads berisi file upload-an user, tambahkan:
+# static/uploads/

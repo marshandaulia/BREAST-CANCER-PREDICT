@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            
+            <div class="col-lg-6 animated-card">
+                <span class="hero-tag">LIVE YOUR LIFE</span>
+                <h1 class="display-4 mt-3">We Care About Your Health</h1>
+                <p class="lead my-4">
+                    Klasifikasikan gambar histopatologi kanker payudara dengan model deep learning kami yang canggih. Akurat, cepat, dan mudah digunakan.
+                </p>
+                <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg shadow-sm">
+                    Mulai Klasifikasi &raquo;
+                </a>
+            </div>
+            
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <img src="{{ url_for('static', filename='images/doctor.png') }}" alt="Doctor" class="hero-image">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4 animated-card">
+            <div class="p-4">
+                <h3 class="fw-bold">Akurat</h3>
+                <p class="text-muted">Didukung oleh model InceptionResNetV2 dengan arsitektur CBAM.</p>
+            </div>
+        </div>
+        <div class="col-md-4 animated-card" style="animation-delay: 0.1s;">
+            <div class="p-4">
+                <h3 class="fw-bold">Cepat</h3>
+                <p class="text-muted">Dapatkan hasil klasifikasi gambar Anda hanya dalam beberapa detik.</p>
+            </div>
+        </div>
+        <div class="col-md-4 animated-card" style="animation-delay: 0.2s;">
+            <div class="p-4">
+                <h3 class="fw-bold">Otomatis</h3>
+                <p class="text-muted">Proses preprocessing (CLAHE) berjalan otomatis di backend.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
