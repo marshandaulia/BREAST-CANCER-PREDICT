@@ -17,8 +17,7 @@
 - [Dataset](#-dataset)
 - [Struktur Folder](#-struktur-folder)
 - [Instalasi & Cara Menjalankan](#-instalasi--cara-menjalankan)
-- [Tangkapan Layar](#-tangkapan-layar)
-- [Tim Pengembang](#-tim-pengembang)
+- [Tim Pengembang](#-anggota-kelompok)
 
 ---
 
@@ -81,5 +80,50 @@ BREAST-CANCER-PREDICT/
 │   └── about.html
 └── models/
     └── model_with_cbam.h5 # FILE MODEL WAJIB ADA DI SINI
-
+```
 ## 💻 Instalasi & Cara Menjalankan
+
+Ikuti langkah-langkah ini secara berurutan untuk menjalankan proyek di komputer lokal Anda:
+
+### 1. Clone Repositori
+Buka terminal (Command Prompt/PowerShell) dan jalankan perintah berikut:
+```bash
+git clone [https://github.com/marshandaulia/BREAST-CANCER-PREDICT.git](https://github.com/marshandaulia/BREAST-CANCER-PREDICT.git)
+cd BREAST-CANCER-PREDICT
+```
+### 2. Buat Virtual Environment (Wajib)
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+### 4. Konfigurasi Model (PENTING)
+```text
+File model AI (model_with_cbam.h5) berukuran besar (>100MB) sehingga tidak disertakan langsung di dalam GitHub ini.
+1. Unduh file model_with_cbam.h5 dari penyimpanan tim (Google Drive/Kaggle Output).
+2. Salin/Copy file tersebut.
+3. Tempel/Paste ke dalam folder models/ di dalam direktori proyek ini.
+```
+### 5. Konfigurasi API Key
+### 6. Jalankan Aplikasi 
+```bash
+python app.py
+```
+### 7. Akses Website
+```text
+Buka browser (Chrome/Edge/Firefox) dan kunjungi alamat: http://127.0.0.1:5000/
+```
+
+## 👥 Anggota Kelompok
+```text
+Ketua: Marshanda Aulia Saroinsong
+Anggota:
+- Monica Giselle Sumual
+- Chelsea Virsty Juliayarnes, Rantung
+- Timo Baware Meres
+- Quiland Mark Nico Wenas
+
+
