@@ -9,10 +9,10 @@
                 <span class="hero-tag">LIVE YOUR LIFE</span>
                 <h1 class="display-4 mt-3">We Care About Your Health</h1>
                 <p class="lead my-4">
-                    Klasifikasikan gambar histopatologi kanker payudara dengan model deep learning kami yang canggih. Akurat, cepat, dan mudah digunakan.
+                    Classify breast cancer histopathology images with our advanced deep learning model. Accurate, fast, and easy to use.
                 </p>
                 <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg shadow-sm">
-                    Mulai Klasifikasi &raquo;
+                    Start Classification &raquo;
                 </a>
             </div>
             
@@ -25,25 +25,44 @@
 </div>
 
 <div class="container my-5">
-    <div class="row text-center">
+    <div class="row text-center g-4">
+        
         <div class="col-md-4 animated-card">
-            <div class="p-4">
-                <h3 class="fw-bold">Akurat</h3>
-                <p class="text-muted">Didukung oleh model InceptionResNetV2 dengan arsitektur CBAM.</p>
+            <div class="card h-100 shadow-sm border-0 p-4">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="icon-circle text-white d-flex justify-content-center align-items-center mb-4"> {# Removed bg-success #}
+                        <i class="bi bi-bullseye display-5"></i>
+                    </div>
+                    <h3 class="fw-bold">Accurate</h3>
+                    <p class="text-muted">Powered by the InceptionResNetV2 model with CBAM architecture.</p>
+                </div>
             </div>
         </div>
+        
         <div class="col-md-4 animated-card" style="animation-delay: 0.1s;">
-            <div class="p-4">
-                <h3 class="fw-bold">Cepat</h3>
-                <p class="text-muted">Dapatkan hasil klasifikasi gambar Anda hanya dalam beberapa detik.</p>
+            <div class="card h-100 shadow-sm border-0 p-4">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="icon-circle text-white d-flex justify-content-center align-items-center mb-4"> {# Removed bg-success #}
+                        <i class="bi bi-lightning-charge-fill display-5"></i>
+                    </div>
+                    <h3 class="fw-bold">Fast</h3>
+                    <p class="text-muted">Get your image classification results in just a few seconds.</p>
+                </div>
             </div>
         </div>
+        
         <div class="col-md-4 animated-card" style="animation-delay: 0.2s;">
-            <div class="p-4">
-                <h3 class="fw-bold">Otomatis</h3>
-                <p class="text-muted">Proses preprocessing (CLAHE) berjalan otomatis di backend.</p>
+            <div class="card h-100 shadow-sm border-0 p-4">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="icon-circle text-white d-flex justify-content-center align-items-center mb-4"> {# Removed bg-success #}
+                        <i class="bi bi-gear-wide-connected display-5"></i>
+                    </div>
+                    <h3 class="fw-bold">Automatic</h3>
+                    <p class="text-muted">Preprocessing (CLAHE) runs automatically on the backend.</p>
+                </div>
             </div>
         </div>
+        
     </div>
 </div>
 {% endblock %}

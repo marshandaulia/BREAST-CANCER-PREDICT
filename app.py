@@ -1,24 +1,27 @@
 import os
 import numpy as np
 import cv2
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-# Load environment variables
+# Load environment variables (membaca dari file .env)
 load_dotenv()
 
-# Setup Gemini
-# Read API key from environment first. If it's missing, avoid calling
-# genai.configure(...) with a None key and disable LLM calls safely.
-# NOTE: The API key has been embedded here per your request. This is
-# convenient for quick testing but insecure for production. Prefer
-# storing secrets in environment variables or a .env file.
-GEMINI_API_KEY = 'AIzaSyDr0Cq4k7vqTmOCtbwCh6ckb3vvujnPv1o'
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_llm = genai.GenerativeModel('gemini-2.5-flash')
-print("Gemini LLM initialized successfully.")
+# --- PERBAIKAN INISIALISASI LLM: BACA DARI ENVIRONMENT ---
+API_KEY = os.getenv("GEMINI_API_KEY") 
+gemini_llm = None
+if API_KEY:
+    try:
+        genai.configure(api_key=API_KEY)
+        gemini_llm = genai.GenerativeModel('gemini-2.5-flash') 
+        print("Gemini LLM initialized successfully.")
+    except Exception as e:
+        print(f"Gagal menginisialisasi Gemini LLM: {e}")
+else:
+    print("Peringatan: GEMINI_API_KEY tidak ditemukan. Penjelasan LLM akan dinonaktifkan.")
+# --- AKHIR PERBAIKAN INISIALISASI LLM ---
 
 # Import Keras/TensorFlow
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
@@ -50,43 +53,89 @@ def get_explanation(prediction_class, confidence):
     """
     Mendapatkan penjelasan dari Gemini tentang hasil klasifikasi
     """
+def get_gemini_explanation(text_prompt):
+    """
+    Simple wrapper to call Gemini and return a short explanation string.
+    If a global `gemini_llm` was initialized, use it; otherwise create a model instance locally.
+    """
     try:
-        # If the Gemini client wasn't initialized because the API key
-        # wasn't provided, return a helpful message instead of attempting
-        # to call the library and raising the ADC/No API key error.
-        if gemini_llm is None:
-            return (
-                "Penjelasan LLM tidak tersedia karena kunci API Gemini belum dikonfigurasi. "
-                "Silakan atur variabel lingkungan GEMINI_API_KEY atau konsultasikan hasil ini dengan dokter Anda."
-            )
-        prompt = f"""Sebagai seorang ahli patologi, berikan penjelasan singkat dalam bahasa Indonesia yang mudah dipahami tentang hasil klasifikasi histopatologi kanker payudara ini:
+        model = gemini_llm if gemini_llm is not None else genai.GenerativeModel("gemini-2.5-flash")
 
-        HASIL DETEKSI:
-        {prediction_class}
-        (Tingkat keyakinan: {confidence:.2f}%)
+        contents = [text_prompt]
 
-        Tolong jelaskan dalam format berikut:
-        1️⃣ Karakteristik: [jelaskan ciri khas dari tipe kanker ini]
-        2️⃣ Tingkat Keparahan: [jelaskan seberapa serius kondisi ini]
-        3️⃣ Saran Tindakan: [berikan 2-3 saran tindakan lanjutan]
+        response = model.generate_content(contents)
 
-        Gunakan bahasa yang sederhana dan empatik. Hindari istilah medis yang terlalu teknis."""
+        text_out = None
+        # Try to return the easy path first
+        if hasattr(response, 'text') and response.text:
+            text_out = response.text
 
-        # Use the dedicated Gemini client (gemini_llm) so we don't call
-        # methods on the TensorFlow model by mistake.
-        response = gemini_llm.generate_content(prompt,
-                                       generation_config={
-                                           'temperature': 0.3,
-                                           'top_k': 32,
-                                           'max_output_tokens': 150
-                                       })
-        return response.text
+        # Fallback to candidates (SDK may return candidates)
+        if not text_out and hasattr(response, 'candidates') and response.candidates:
+            cand = response.candidates[0]
+            try:
+                # Try common attribute path
+                text_out = cand.content[0].text
+            except Exception:
+                try:
+                    # sometimes candidate has .text
+                    text_out = cand.text
+                except Exception:
+                    text_out = str(cand)
+
+        if not text_out:
+            return "Maaf, Gemini tidak mengembalikan penjelasan yang valid."
+
+        # Strip common opening phrases that Gemini adds (e.g., "Tentu, berikut penjelasannya:")
+        import re
+        text_out = re.sub(r'^(Tentu|Baik),?\s*[^:\n]*:?\s*\n*', '', text_out, flags=re.IGNORECASE)
+        text_out = text_out.strip()
+
+        # At this point, `text_out` is expected to be Markdown (we request Markdown in the prompt)
+        # Convert Markdown to HTML if possible; otherwise perform a simple fallback conversion.
+        try:
+            import markdown as md_lib
+            html = md_lib.markdown(text_out, extensions=['extra', 'nl2br'])
+            # Remove excessive <br> tags (more than 2 in a row)
+            html = re.sub(r'(<br\s*/?>\s*){2,}', '<br><br>', html)
+            return html
+        except Exception:
+            # Simple fallback: basic replacements for bold and newlines
+            try:
+                import re
+                html = text_out
+                # bold **text** -> <strong>text</strong>
+                html = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", html)
+                # simple unordered lists: lines starting with - or *
+                lines = html.splitlines()
+                out_lines = []
+                in_list = False
+                for ln in lines:
+                    if ln.strip().startswith(('-', '*')):
+                        if not in_list:
+                            out_lines.append('<ul>')
+                            in_list = True
+                        out_lines.append(f"<li>{ln.strip()[1:].strip()}</li>")
+                    else:
+                        if in_list:
+                            out_lines.append('</ul>')
+                            in_list = False
+                        if ln.strip() == '':
+                            out_lines.append('<p></p>')
+                        else:
+                            out_lines.append(f"<p>{ln}</p>")
+                if in_list:
+                    out_lines.append('</ul>')
+                return '\n'.join(out_lines)
+            except Exception:
+                # Last resort: escape and return raw text
+                return text_out
+
     except Exception as e:
-        print(f"Error saat berkomunikasi dengan Gemini: {str(e)}")
-        return "Maaf, terjadi kesalahan saat menghasilkan penjelasan. Silakan konsultasikan hasil ini dengan dokter Anda."
-
+        print(f"Error calling Gemini API: {e}")
+        return f"Error: {str(e)}"
 # ----------------------------------------------------------------------------
-# 1. Fungsi CLAHE (dari notebook)
+# 1. Fungsi CLAHE
 # ----------------------------------------------------------------------------
 def apply_clahe_to_color_image(image):
     """Menerapkan CLAHE ke gambar warna BGR (dari cv2.imread)."""
@@ -100,7 +149,7 @@ def apply_clahe_to_color_image(image):
     return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
 # ----------------------------------------------------------------------------
-# 2. Definisi Class CBAM (dari notebook)
+# 2. Definisi Class CBAM
 # ----------------------------------------------------------------------------
 class CBAM(Layer):
     def __init__(self, reduction_ratio=16):
@@ -157,19 +206,13 @@ class CBAM(Layer):
         return config
 
 # ----------------------------------------------------------------------------
-# 3. Fungsi Arsitektur Model (dari notebook) - DENGAN PERBAIKAN
+# 3. Fungsi Arsitektur Model
 # ----------------------------------------------------------------------------
 def build_model_with_cbam(input_shape=(224, 224, 3), num_classes=8):
     base_model = InceptionResNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
-    
-    # --- PERBAIKAN DI SINI ---
-    # Harus 'True' agar arsitekturnya sama persis dengan notebook saat menyimpan
     base_model.trainable = True 
-    # -------------------------
 
     inputs = Input(shape=input_shape)
-    # 'training=False' di sini memastikan model berjalan dalam mode inferensi
-    # (misalnya, BatchNormalization menggunakan statistik yang tersimpan)
     x = base_model(inputs, training=False) 
     x = CBAM()(x)
     x = Flatten()(x)
@@ -205,23 +248,21 @@ CLASS_NAMES = [
 ]
 
 # ----------------------------------------------------------------------------
-# 5. Muat Model (Cara yang Diperbaiki)
+# 5. Muat Model
 # ----------------------------------------------------------------------------
 model = None
 try:
     print("Membangun arsitektur model...")
-    # Panggil fungsi untuk membangun arsitektur (jumlah kelas = 8)
     model = build_model_with_cbam(input_shape=(224, 224, 3), num_classes=8)
     
     print(f"Mencoba memuat bobot (weights) dari: {MODEL_PATH}")
-    # Muat HANYA bobot (weights) ke arsitektur yang ada
     model.load_weights(MODEL_PATH)
     
     print("Model dan bobot (weights) berhasil dimuat.")
 
 except Exception as e:
     print(f"GAGAL MEMUAT MODEL/BOBOT: {e}")
-    print("Pastikan file 'model_with_cbam.h5' ada di folder 'models' dan arsitektur model di app.py sama dengan di notebook.")
+    print("Pastikan file 'model_with_cbam.h5' ada di folder 'models'.")
     model = None
 
 # ----------------------------------------------------------------------------
@@ -256,7 +297,7 @@ def model_predict(img_path, model):
         x = np.expand_dims(x, axis=0) 
 
         # 6. Lakukan prediksi
-        preds = model.predict(x)
+        preds = model.predict(x, verbose=0)
         return preds
         
     except Exception as e:
@@ -309,30 +350,64 @@ def predict():
                     result_text = f"Hasil Prediksi: {result} ({confidence:.2f}%)"
                     print(f"[DEBUG] pred_class_index={pred_class_index}, result_text={result_text}")
 
-                    # Dapatkan penjelasan dari LLM
+                    # Dapatkan penjelasan dari LLM (sederhana)
                     try:
-                        explanation = get_explanation(result, confidence)
+                        prompt = (
+                            f"Hasil klasifikasi: {result} (Tingkat keyakinan: {confidence:.2f}%). "
+                            "Berikan penjelasan singkat dalam bahasa Indonesia, berikan 2-3 saran non-medis, "
+                            "dan tegaskan bahwa ini bukan diagnosis medis resmi. "
+                            "Formatkan jawaban dalam Markdown (gunakan heading, daftar bullet, dan teks tebal untuk penekanan)."
+                        )
+                        explanation = get_gemini_explanation(prompt)
                     except Exception as e:
                         explanation = "Maaf, tidak dapat menghasilkan penjelasan saat ini."
-                        print(f"[DEBUG] get_explanation failed: {e}")
+                        print(f"[DEBUG] get_gemini_explanation failed: {e}")
+                
+                    # Gunakan forward slash (/) untuk URL
+                    image_url = f'uploads/{filename}'
+                    
+                    return render_template('predict.html', 
+                                           prediction_text=result_text, 
+                                           explanation_text=explanation,
+                                           image_path=image_url)
                 except Exception as e:
                     print(f"[ERROR] Kesalahan saat memproses prediksi: {e}")
                     return render_template('predict.html', prediction_text="Error saat memproses prediksi.", image_path=None)
-                
-                # --- PERBAIKAN DI SINI ---
-                # Gunakan forward slash (/) untuk URL, bukan os.path.join
-                image_url = f'uploads/{filename}'
-                # -------------------------
-                
-                return render_template('predict.html', 
-                                     prediction_text=result_text, 
-                                     explanation_text=explanation,
-                                     image_path=image_url)
             else:
                 return render_template('predict.html', prediction_text="Error saat melakukan prediksi.", image_path=None)
 
     # Jika method GET
     return render_template('predict.html', prediction_text=None, image_path=None)
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    """Simple chat endpoint to answer follow-up questions about a prediction.
+    Expects JSON: { message: str, prediction: str }
+    Returns JSON: { reply: html }
+    """
+    try:
+        data = request.get_json() or {}
+        message = data.get('message', '').strip()
+        prediction = data.get('prediction', '')
+
+        if not message:
+            return jsonify({'error': 'Pesan kosong.'}), 400
+
+        # Build a compact prompt for follow-up Q&A, request Markdown output
+        prompt = (
+            f"Hasil klasifikasi: {prediction}.\n"
+            f"Pengguna bertanya: {message}\n"
+            "Jawab singkat dalam bahasa Indonesia. Gunakan format Markdown (heading dan daftar jika perlu). "
+            "Tegaskan bahwa ini bukan diagnosis medis resmi jika pertanyaan menyangkut diagnosis."
+        )
+
+        reply_html = get_gemini_explanation(prompt)
+
+        return jsonify({'reply': reply_html})
+    except Exception as e:
+        print(f"Error in /chat: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # ----------------------------------------------------------------------------
 # 8. Jalankan Aplikasi
