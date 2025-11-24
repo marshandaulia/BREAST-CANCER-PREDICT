@@ -89,7 +89,7 @@ Ikuti langkah-langkah ini secara berurutan untuk menjalankan proyek di komputer 
 ### 1. Clone Repositori
 Buka terminal (Command Prompt/PowerShell) dan jalankan perintah berikut:
 ```bash
-git clone [https://github.com/marshandaulia/BREAST-CANCER-PREDICT.git](https://github.com/marshandaulia/BREAST-CANCER-PREDICT.git)
+git clone https://github.com/marshandaulia/BREAST-CANCER-PREDICT.git
 cd BREAST-CANCER-PREDICT
 ```
 ### 2. Buat Virtual Environment (Wajib)
