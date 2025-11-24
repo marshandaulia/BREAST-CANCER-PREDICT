@@ -1,0 +1,85 @@
+# 🎗️ Sistem Klasifikasi Kanker Payudara Multi-Kelas Berbasis Web Menggunakan CBAM dan LLM
+
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+![Flask](https://img.shields.io/badge/Framework-Flask-green)
+![Gemini AI](https://img.shields.io/badge/LLM-Google%20Gemini-blueviolet)
+
+> **Final Project - Artificial Intelligence**
+> Sistem deteksi dini dan klasifikasi histopatologi kanker payudara yang tidak hanya memprediksi kelas kanker, tetapi juga memberikan penjelasan medis yang mudah dipahami menggunakan Generative AI.
+
+---
+
+## 📋 Daftar Isi
+- [Latar Belakang](#-latar-belakang)
+- [Fitur Utama](#-fitur-utama)
+- [Arsitektur Sistem](#-arsitektur-sistem)
+- [Dataset](#-dataset)
+- [Struktur Folder](#-struktur-folder)
+- [Instalasi & Cara Menjalankan](#-instalasi--cara-menjalankan)
+- [Tangkapan Layar](#-tangkapan-layar)
+- [Tim Pengembang](#-tim-pengembang)
+
+---
+
+## 🧐 Latar Belakang
+Diagnosis kanker payudara melalui citra histopatologi seringkali menantang karena kompleksitas visual dan kontras gambar yang rendah. Proyek ini bertujuan untuk membangun sistem pendukung keputusan (*decision support system*) yang membantu mengklasifikasikan jenis kanker payudara ke dalam **8 kelas spesifik** (seperti Ductal Carcinoma, Adenosis, dll) dengan akurasi tinggi menggunakan *Deep Learning* dan memberikan konteks penjelasan menggunakan *Large Language Model* (LLM).
+
+---
+
+## 🚀 Fitur Utama
+
+1.  **Multi-Class Classification:** Mampu mendeteksi 8 jenis histopatologi kanker payudara (Benign & Malignant).
+2.  **Advanced Preprocessing (CLAHE):** Menggunakan *Contrast Limited Adaptive Histogram Equalization* untuk mempertajam detail citra medis sebelum diproses.
+3.  **Attention Mechanism (CBAM):** Mengintegrasikan *Convolutional Block Attention Module* agar model fokus pada area sel yang paling relevan.
+4.  **Generative AI Explanation:** Terintegrasi dengan **Google Gemini AI** untuk memberikan penjelasan hasil prediksi yang informatif dan ramah pengguna.
+5.  **User-Friendly Web Interface:** Antarmuka berbasis web yang sederhana dan responsif menggunakan Flask.
+
+---
+
+## 🏗️ Arsitektur Sistem
+
+Sistem ini menggunakan pendekatan *Hybrid Architecture*:
+
+1.  **Backbone:** `InceptionResNetV2` (Transfer Learning dari ImageNet).
+2.  **Attention Module:** `CBAM` (Channel & Spatial Attention) untuk meningkatkan fokus fitur.
+3.  **Preprocessing:** OpenCV dengan metode CLAHE.
+4.  **Explanation Engine:** Google Gemini API (LLM).
+
+---
+
+## 📊 Dataset
+
+Dataset yang digunakan adalah **BreakHis (Breast Cancer Histopathological Database)**.
+* **Sumber:** [Kaggle Dataset](https://www.kaggle.com/code/manofnoego/multi-class-breast-cancer-classification-with-cbam)
+* **Jumlah Kelas:** 8 Kelas
+    * **Jinak (Benign):** Adenosis, Fibroadenoma, Phyllodes Tumor, Tubular Adenoma.
+    * **Ganas (Malignant):** Ductal Carcinoma, Lobular Carcinoma, Mucinous Carcinoma, Papillary Carcinoma.
+
+---
+
+## 📂 Struktur Folder
+
+Pastikan struktur folder proyek Anda terlihat seperti ini agar aplikasi berjalan lancar:
+
+```text
+BREAST-CANCER-PREDICT/
+├── app.py                 # File utama aplikasi Flask
+├── requirements.txt       # Daftar pustaka yang dibutuhkan
+├── .env                   # File konfigurasi API Key (Buat Manual)
+├── static/
+│   ├── uploads/
+│   ├── images/    
+│   └── css
+│   │   └── styles.css
+│   └── js
+│       └── app.js
+│       └── upload-handler.js
+├── templates/
+│   ├── index.html
+│   ├── predict.html
+│   └── about.html
+└── models/
+    └── model_with_cbam.h5 # FILE MODEL WAJIB ADA DI SINI
+
+## 💻 Instalasi & Cara Menjalankan
