@@ -130,4 +130,4 @@ Anggota:
 
 ## Materi Presentasi
 
-* **LINK PPT:** [Materi Presentasi]([https://www.kaggle.com/code/manofnoego/multi-class-breast-cancer-classification-with-cbam](https://www.canva.com/design/DAG4xv4HqUw/5AzRS75A2pP-DUg5n3OW5g/edit?utm_content=DAG4xv4HqUw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+* **LINK PPT:** [Materi Presentasi](https://www.canva.com/design/DAG4xv4HqUw/5AzRS75A2pP-DUg5n3OW5g/edit?utm_content=DAG4xv4HqUw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
