@@ -103,9 +103,9 @@ pip install -r requirements.txt
 ### 4. Konfigurasi Model (PENTING)
 ```text
 File model AI (model_with_cbam.h5) berukuran besar (>100MB) sehingga tidak disertakan langsung di dalam GitHub ini.
-1. Unduh file model_with_cbam.h5 dari penyimpanan tim (Google Drive/Kaggle Output).
-2. Salin/Copy file tersebut.
-3. Tempel/Paste ke dalam folder models/ di dalam direktori proyek ini.
+1. Unduh file model_with_cbam.h5 yang ada di dalam link drive yang sudah di upload di file models.
+2. Download file tersebut.
+3. Masukkan ke dalam folder models/ di dalam direktori proyek ini.
 ```
 ### 5. Konfigurasi API Key
 ### 6. Jalankan Aplikasi 
